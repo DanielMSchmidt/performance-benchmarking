@@ -1,0 +1,34 @@
+{
+  "name": "performance-benchmarking",
+  "version": "0.0.0",
+  "description": "My kickass module",
+  "license": "MIT",
+  "repository": "DanielMSchmidt/performance-benchmarking",
+  "author": {
+    "name": "Daniel Schmidt",
+    "email": "dschmidt@weluse.de",
+    "url": "danielmschmidt.de"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "build": "rm -r ./dist && mkdir ./dist && buble index.js > dist/index.js",
+    "example": "npm run build && node ./example.js",
+    "test": "nxo"
+  },
+  "files": [
+    "dist/index.js",
+    "readme.md"
+  ],
+  "keywords": [
+    ""
+  ],
+  "dependencies": {
+    "microtime": "^2.1.1"
+  },
+  "devDependencies": {
+    "ava": "^0.14.0",
+    "xo": "^0.14.0"
+  }
+}
