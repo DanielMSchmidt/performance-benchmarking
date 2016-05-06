@@ -1,14 +1,13 @@
 'use strict';
-// TODO: add browser support
-var Performance = require('microtime');
+var present = require('present');
 
 function Benchmark(fn, options = {}) {
 	if (!fn) {
 		throw new Error('No function specified');
 	}
 
-	this.maxTime = options.maxTime;
-	this.repetitions = options.repetitions;
+	this.maxTime = options.maxTime || this.maxTime;
+	this.repetitions = options.repetitions || this.repetitions;
 	return this.run(fn);
 }
 
@@ -18,31 +17,44 @@ Benchmark.prototype.repetitions = 100;
 
 Benchmark.prototype.run = function (fn) {
 	// Try initial one, to be safe it works
-	const promise = new Promise(function (resolve, reject) {
+	return new Promise(function (resolve, reject) {
 		fn({resolve, reject});
 		setTimeout(() => reject(), this.maxTime);
-	});
-
-	promise.then(() => {
+	}).then(() => {
 		// Run actual performance tests
-		return this.measure(fn, this.repetitions);
+		return this.measure(fn, this.repetitions).then(accumulatedResults => accumulatedResults / this.repetitions);
 	}, () => {
 		console.log('You initial run took more than ', this.maxTime);
 	});
-
-	return promise;
 };
 
 Benchmark.prototype.measure = function (fn, repetitions) {
+	return new Promise((resolve, reject) => {
+		if (repetitions <= 0) {
+			resolve(0);
+			return;
+		}
+
+		this.singleTest(fn).then(initialResult => {
+			this.measure(fn, repetitions - 1).then(accumulatedResults => {
+				resolve(accumulatedResults + initialResult);
+			});
+		}, () => {
+			console.log('Failed');
+			reject();
+		});
+	});
+};
+
+Benchmark.prototype.singleTest = function (fn) {
 	var initTime;
-	console.log(repetitions);
 	return new Promise(function (resolve, reject) {
-		initTime = Performance.now();
+		initTime = present();
 		fn({resolve, reject});
 	}).then(function () {
-		return Performance.now() - initTime;
+		return present() - initTime;
 	}).then(function (result) {
-		console.log('result: ', result);
+		return result;
 	});
 };
 

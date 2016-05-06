@@ -1,6 +1,5 @@
 'use strict';
-// TODO: add browser support
-var Performance = require('microtime');
+var present = require('present');
 
 function Benchmark(fn, options) {
 	if ( options === void 0 ) options = {};
@@ -9,8 +8,8 @@ function Benchmark(fn, options) {
 		throw new Error('No function specified');
 	}
 
-	this.maxTime = options.maxTime;
-	this.repetitions = options.repetitions;
+	this.maxTime = options.maxTime || this.maxTime;
+	this.repetitions = options.repetitions || this.repetitions;
 	return this.run(fn);
 }
 
@@ -22,31 +21,46 @@ Benchmark.prototype.run = function (fn) {
 	// Try initial one, to be safe it works
 	var this$1 = this;
 
-	var promise = new Promise(function (resolve, reject) {
+	return new Promise(function (resolve, reject) {
 		fn({resolve: resolve, reject: reject});
 		setTimeout(function () { return reject(); }, this.maxTime);
-	});
-
-	promise.then(function () {
+	}).then(function () {
 		// Run actual performance tests
-		return this$1.measure(fn, this$1.repetitions);
+		return this$1.measure(fn, this$1.repetitions).then(function ( accumulatedResults ) { return accumulatedResults / this$1.repetitions; });
 	}, function () {
 		console.log('You initial run took more than ', this$1.maxTime);
 	});
-
-	return promise;
 };
 
 Benchmark.prototype.measure = function (fn, repetitions) {
-	var initTime;
-	console.log(repetitions);
+	var this$1 = this;
+
 	return new Promise(function (resolve, reject) {
-		initTime = Performance.now();
+		if (repetitions <= 0) {
+			resolve(0);
+			return;
+		}
+
+		this$1.singleTest(fn).then(function ( initialResult ) {
+			this$1.measure(fn, repetitions - 1).then(function ( accumulatedResults ) {
+				resolve(accumulatedResults + initialResult);
+			});
+		}, function () {
+			console.log('Failed');
+			reject();
+		});
+	});
+};
+
+Benchmark.prototype.singleTest = function (fn) {
+	var initTime;
+	return new Promise(function (resolve, reject) {
+		initTime = present();
 		fn({resolve: resolve, reject: reject});
 	}).then(function () {
-		return Performance.now() - initTime;
+		return present() - initTime;
 	}).then(function (result) {
-		console.log('result: ', result);
+		return result;
 	});
 };
 
