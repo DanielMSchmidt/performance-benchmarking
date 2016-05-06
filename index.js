@@ -1,5 +1,5 @@
 'use strict';
-var present = require('present');
+const present = require('present');
 
 function Benchmark(fn, options = {}) {
 	if (!fn) {
