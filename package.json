@@ -15,7 +15,7 @@
   "scripts": {
     "build": "rm -r ./dist && mkdir ./dist && buble index.js > dist/index.js",
     "example": "npm run build && node ./example.js",
-    "test": "nxo"
+    "test": "xo"
   },
   "files": [
     "dist/index.js",
