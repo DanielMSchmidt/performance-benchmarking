@@ -17,6 +17,7 @@
     "example": "npm run build && node ./example.js",
     "test": "xo"
   },
+  "main": "dist/index.js",
   "files": [
     "dist/index.js",
     "readme.md"
