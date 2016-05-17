@@ -1,7 +1,7 @@
 {
   "name": "performance-benchmarking",
-  "version": "0.0.0",
-  "description": "My kickass module",
+  "version": "0.0.1",
+  "description": "Performance test your async code with ease",
   "license": "MIT",
   "repository": "DanielMSchmidt/performance-benchmarking",
   "author": {
