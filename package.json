@@ -1,6 +1,6 @@
 {
   "name": "performance-benchmarking",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Performance test your async code with ease",
   "license": "MIT",
   "repository": "DanielMSchmidt/performance-benchmarking",
